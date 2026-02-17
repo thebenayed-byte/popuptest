@@ -1,36 +1,51 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Test Notification Mobile</title>
+<meta charset="UTF-8">
+<title>Push Test</title>
 </head>
 <body style="font-family:sans-serif;text-align:center;margin-top:100px;">
 
-<h2>Test Notification Smartphone</h2>
-<button onclick="sendNotification()">Envoyer notification</button>
+<h2>Notifications Réelles Firebase</h2>
+<button onclick="init()">Activer les notifications</button>
 
-<script>
-async function sendNotification() {
-  if (!("Notification" in window)) {
-    alert("Notifications non supportées");
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDwIGeziyq7cQQqQp8PuAVPw6c9J8-9o1g",
+  authDomain: "popup-bfbde.firebaseapp.com",
+  projectId: "popup-bfbde",
+  storageBucket: "popup-bfbde.firebasestorage.app",
+  messagingSenderId: "402296852000",
+  appId: "1:402296852000:web:09fcc8966b238288a5f645",
+  measurementId: "G-NYVPD0QYYD"
+};
+
+const app = initializeApp(firebaseConfig);
+const messaging = getMessaging(app);
+
+window.init = async function() {
+
+  const permission = await Notification.requestPermission();
+  if (permission !== "granted") {
+    alert("Permission refusée");
     return;
   }
 
-  let permission = await Notification.requestPermission();
+  const registration = await navigator.serviceWorker.register("./firebase-messaging-sw.js");
 
-  if (permission === "granted") {
-    navigator.serviceWorker.register("service-worker.js")
-    .then(reg => {
-      reg.showNotification("🔥 Nouveau message", {
-        body: "Ceci est un test en arrière-plan",
-        icon: "https://cdn-icons-png.flaticon.com/512/1827/1827392.png",
-        vibrate: [200,100,200]
-      });
-    });
-  } else {
-    alert("Permission refusée");
-  }
-}
+  const token = await getToken(messaging, {
+    vapidKey: "3P8-pewWV_6f304jt8Ome7UhytM0r8PtH63_9q4FAl0",
+    serviceWorkerRegistration: registration
+  });
+
+  alert("TOKEN UTILISATEUR :\n\n" + token);
+  console.log("TOKEN :", token);
+};
+
 </script>
 
 </body>
