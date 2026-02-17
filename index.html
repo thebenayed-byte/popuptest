@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Test Notification Mobile</title>
+</head>
+<body style="font-family:sans-serif;text-align:center;margin-top:100px;">
+
+<h2>Test Notification Smartphone</h2>
+<button onclick="sendNotification()">Envoyer notification</button>
+
+<script>
+async function sendNotification() {
+  if (!("Notification" in window)) {
+    alert("Notifications non supportées");
+    return;
+  }
+
+  let permission = await Notification.requestPermission();
+
+  if (permission === "granted") {
+    navigator.serviceWorker.register("service-worker.js")
+    .then(reg => {
+      reg.showNotification("🔥 Nouveau message", {
+        body: "Ceci est un test en arrière-plan",
+        icon: "https://cdn-icons-png.flaticon.com/512/1827/1827392.png",
+        vibrate: [200,100,200]
+      });
+    });
+  } else {
+    alert("Permission refusée");
+  }
+}
+</script>
+
+</body>
+</html>
